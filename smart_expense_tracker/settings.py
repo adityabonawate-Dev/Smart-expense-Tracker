@@ -5,7 +5,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-smart-expense-tracker-local-2026"
 DEBUG = True
-ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if h.strip()]
+ALLOWED_HOSTS = [
+    "smart-expense-trackergunicorn-smart.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://smart-expense-trackergunicorn-smart.onrender.com",
+]
 
 # Payment configuration. Keep DEMO_MODE=0 for production.
 RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "")
