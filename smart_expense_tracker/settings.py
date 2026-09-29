@@ -4,7 +4,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-smart-expense-tracker-local-2026"
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = [
     "smart-expense-trackergunicorn-smart.onrender.com",
     "localhost",
