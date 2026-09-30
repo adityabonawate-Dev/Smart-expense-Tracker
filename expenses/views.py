@@ -238,7 +238,13 @@ def register(request):
         except IntegrityError:
             messages.error(request, "Could not create the account. Please try another username.")
             return render(request, "registration/register.html")
+            except Exception as e:
+                  import traceback
+                  traceback.print_exc()
+                  messages.error(request, f"Registration error: {e}")
+                  return render(request, "registration/register.html")
 
+  
         login(request, user)
         messages.success(request, "Account created successfully. Your 30-day free trial has started!")
         return redirect("dashboard")
