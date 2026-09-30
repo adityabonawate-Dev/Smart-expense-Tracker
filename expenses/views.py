@@ -218,62 +218,75 @@ def register(request):
         if not username or not email or not password or not confirm:
             messages.error(request, "Please fill in all required fields.")
             return render(request, "registration/register.html")
+
         if len(password) < 6:
-            messages.error(request, "Password must contain at least 6 characters.")
+            messages.error(
+                request,
+                "Password must contain at least 6 characters."
+            )
             return render(request, "registration/register.html")
+
         if password != confirm:
             messages.error(request, "Passwords do not match.")
             return render(request, "registration/register.html")
+
         if User.objects.filter(username__iexact=username).exists():
-            messages.error(request, "Username already exists. Please choose another username.")
+            messages.error(
+                request,
+                "Username already exists. Please choose another username."
+            )
             return render(request, "registration/register.html")
+
         if User.objects.filter(email__iexact=email).exists():
-            messages.error(request, "This email is already registered.")
+            messages.error(
+                request,
+                "This email is already registered."
+            )
             return render(request, "registration/register.html")
 
-    try:
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            first_name=first_name
-        )
+        try:
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                first_name=first_name
+            )
 
-        seed_categories(user)
+            seed_categories(user)
 
-        UserProfile.objects.create(
-            user=user,
-            subscription_active=False,
-            trial_started_at=timezone.now()
-        )
+            UserProfile.objects.create(
+                user=user,
+                subscription_active=False,
+                trial_started_at=timezone.now()
+            )
 
-    except IntegrityError:
-        messages.error(
+        except IntegrityError:
+            messages.error(
+                request,
+                "Could not create the account. Please try another username."
+            )
+            return render(request, "registration/register.html")
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+
+            messages.error(
+                request,
+                f"Registration error: {e}"
+            )
+            return render(request, "registration/register.html")
+
+        login(request, user)
+
+        messages.success(
             request,
-            "Could not create the account. Please try another username."
+            "Account created successfully. Your 30-day free trial has started!"
         )
-        return render(request, "registration/register.html")
 
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
+        return redirect("dashboard")
 
-        messages.error(
-            request,
-            f"Registration error: {e}"
-        )
-        return render(request, "registration/register.html")
-
-    login(request, user)
-
-    messages.success(
-        request,
-        "Account created successfully. Your 30-day free trial has started!"
-    )
-
-    return redirect("dashboard")
-
-  
+    return render(request, "registration/register.html")
 
 
 def login_view(request):
