@@ -273,14 +273,7 @@ def register(request):
 
     return redirect("dashboard")
 
-login(request, user)
-messages.success(
-    request,
-    "Account created successfully. Your 30-day free trial has started!"
-)
-return redirect("dashboard")
-
-    return render(request, "registration/register.html")
+  
 
 
 def login_view(request):
