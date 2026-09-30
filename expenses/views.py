@@ -231,35 +231,47 @@ def register(request):
             messages.error(request, "This email is already registered.")
             return render(request, "registration/register.html")
 
-      try:
-    user = User.objects.create_user(
-        username=username,
-        email=email,
-        password=password,
-        first_name=first_name
-    )
+    try:
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            first_name=first_name
+        )
 
-    seed_categories(user)
+        seed_categories(user)
 
-    UserProfile.objects.create(
-        user=user,
-        subscription_active=False,
-        trial_started_at=timezone.now()
-    )
+        UserProfile.objects.create(
+            user=user,
+            subscription_active=False,
+            trial_started_at=timezone.now()
+        )
 
-except IntegrityError:
-    messages.error(
+    except IntegrityError:
+        messages.error(
+            request,
+            "Could not create the account. Please try another username."
+        )
+        return render(request, "registration/register.html")
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+
+        messages.error(
+            request,
+            f"Registration error: {e}"
+        )
+        return render(request, "registration/register.html")
+
+    login(request, user)
+
+    messages.success(
         request,
-        "Could not create the account. Please try another username."
+        "Account created successfully. Your 30-day free trial has started!"
     )
-    return render(request, "registration/register.html")
 
-except Exception as e:
-    import traceback
-    traceback.print_exc()
-
-    messages.error(request, f"Registration error: {e}")
-    return render(request, "registration/register.html")
+    return redirect("dashboard")
 
 login(request, user)
 messages.success(
